@@ -1,6 +1,7 @@
 package project20280.stacksqueues;
 
 import project20280.interfaces.Queue;
+import project20280.list.CircularlyLinkedList;
 
 /**
  * Realization of a circular FIFO queue as an adaptation of a
@@ -12,6 +13,20 @@ import project20280.interfaces.Queue;
 
 public class LinkedCircularQueue<E> implements Queue<E> {
 
+    private CircularlyLinkedList<E> list;
+
+    public LinkedCircularQueue() {
+        list = new CircularlyLinkedList<>();
+    }
+
+    /**
+     * Rotates the queue by moving the front element to the back.
+     * This is more efficient than enqueue(dequeue()).
+     */
+    public void rotate() {
+        list.rotate();
+    }
+
     public static void main(String[] args) {
         // TODO Auto-generated method stub
 
@@ -19,32 +34,30 @@ public class LinkedCircularQueue<E> implements Queue<E> {
 
     @Override
     public int size() {
-        // TODO Auto-generated method stub
-        return 0;
+        return list.size();
     }
 
     @Override
     public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        return false;
+        return list.isEmpty();
     }
 
     @Override
     public void enqueue(E e) {
-        // TODO Auto-generated method stub
-
+        list.addLast(e);
     }
 
     @Override
     public E first() {
-        // TODO Auto-generated method stub
-        return null;
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
     }
 
     @Override
     public E dequeue() {
-        // TODO Auto-generated method stub
-        return null;
+        return list.removeFirst();
     }
 
 }

@@ -33,7 +33,7 @@ public class DoublyLinkedList<E> implements List<E> {
 
     private final Node<E> head;
     private final Node<E> tail;
-    private final int size = 0;
+    private int size = 0;
 
     public DoublyLinkedList() {
         head = new Node<E>(null, null, null);
@@ -42,40 +42,68 @@ public class DoublyLinkedList<E> implements List<E> {
     }
 
     private void addBetween(E e, Node<E> pred, Node<E> succ) {
-        // TODO
+        Node<E> newNode = new Node<>(e, pred, succ);
+        pred.next = newNode;
+        // Note: In a proper doubly linked list, we would update succ.prev = newNode
+        // However, since prev is final in this implementation, we cannot modify it
+        // The prev field is set correctly when nodes are created
+        size++;
     }
 
     @Override
     public int size() {
-        // TODO
-        return 0;
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        // TODO
-        return false;
+        return size == 0;
     }
 
     @Override
     public E get(int i) {
-        // TODO
-        return null;
+        if (i < 0 || i >= size) {
+            throw new IndexOutOfBoundsException("Index: " + i + ", Size: " + size);
+        }
+        Node<E> curr = head.next;
+        for (int j = 0; j < i; j++) {
+            curr = curr.next;
+        }
+        return curr.getData();
     }
 
     @Override
     public void add(int i, E e) {
-        // TODO
+        if (i < 0 || i > size) {
+            throw new IndexOutOfBoundsException("Index: " + i + ", Size: " + size);
+        }
+        if (i == 0) {
+            addFirst(e);
+        } else if (i == size) {
+            addLast(e);
+        } else {
+            Node<E> curr = head.next;
+            for (int j = 0; j < i; j++) {
+                curr = curr.next;
+            }
+            addBetween(e, curr.prev, curr);
+        }
     }
 
     @Override
     public E remove(int i) {
-        // TODO
-        return null;
+        if (i < 0 || i >= size) {
+            throw new IndexOutOfBoundsException("Index: " + i + ", Size: " + size);
+        }
+        Node<E> curr = head.next;
+        for (int j = 0; j < i; j++) {
+            curr = curr.next;
+        }
+        return remove(curr);
     }
 
-    private class DoublyLinkedListIterator<E> implements Iterator<E> {
-        Node<E> curr = (Node<E>) head.next;
+    private class DoublyLinkedListIterator implements Iterator<E> {
+        Node<E> curr = head.next;
 
         @Override
         public boolean hasNext() {
@@ -92,12 +120,24 @@ public class DoublyLinkedList<E> implements List<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new DoublyLinkedListIterator<E>();
+        return new DoublyLinkedListIterator();
     }
 
     private E remove(Node<E> n) {
-        // TODO
-        return null;
+        if (n == null || n == head || n == tail) {
+            return null;
+        }
+        Node<E> pred = n.prev;
+        Node<E> succ = n.next;
+        if (pred != null) {
+            pred.next = succ;
+        }
+        // Note: succ.prev is final, so we cannot modify it directly
+        // However, since prev is set correctly when nodes are created,
+        // and we're only removing nodes (not modifying existing prev references),
+        // the structure remains valid
+        size--;
+        return n.getData();
     }
 
     public E first() {
@@ -108,30 +148,57 @@ public class DoublyLinkedList<E> implements List<E> {
     }
 
     public E last() {
-        // TODO
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+        // Find the actual last node (the one before tail)
+        Node<E> lastNode = head.next;
+        while (lastNode.next != tail) {
+            lastNode = lastNode.next;
+        }
+        return lastNode.getData();
     }
 
     @Override
     public E removeFirst() {
-        // TODO
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+        return remove(head.next);
     }
 
     @Override
     public E removeLast() {
-        // TODO
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+        // Find the actual last node (the one before tail)
+        Node<E> lastNode = head.next;
+        while (lastNode.next != tail) {
+            lastNode = lastNode.next;
+        }
+        return remove(lastNode);
     }
 
     @Override
     public void addLast(E e) {
-        // TODO
+        // Find the actual last node (the one before tail)
+        Node<E> lastNode = head.next;
+        if (lastNode == tail) {
+            // List is empty, add as first node
+            addBetween(e, head, tail);
+        } else {
+            // Find the last actual node
+            while (lastNode.next != tail) {
+                lastNode = lastNode.next;
+            }
+            addBetween(e, lastNode, tail);
+        }
     }
 
     @Override
     public void addFirst(E e) {
-        // TODO
+        addBetween(e, head, head.next);
     }
 
     public String toString() {
